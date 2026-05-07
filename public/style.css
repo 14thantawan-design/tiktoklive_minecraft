@@ -1,0 +1,121 @@
+body { 
+    background-color: #1e1e2e; color: #cdd6f4; 
+    font-family: 'Segoe UI', sans-serif; padding: 20px; 
+    max-width: 1200px; margin: 0 auto;
+}
+h1 { color: #89b4fa; border-bottom: 2px solid #313244; padding-bottom: 10px; }
+h3 { color: #f5c2e7; margin-bottom: 10px; }
+h4 { color: #89dceb; margin-top: 0; }
+
+/* Connection Panel (มุมบนซ้าย) */
+.connection-panel {
+    position: fixed; top: 20px; left: 20px; width: 220px;
+    background-color: #181825; padding: 15px; border-radius: 12px; 
+    border: 1px solid #313244; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+.connection-panel h4 { color: #89dceb; margin-top: 0; margin-bottom: 12px; }
+.connection-panel .btn-connect {
+    margin-bottom: 8px; font-size: 13px; padding: 10px;
+}
+.btn-connect {
+    transition: all 0.3s ease;
+}
+.btn-disconnected {
+    background-color: #f38ba8; color: #11111b;
+}
+.btn-disconnected:hover {
+    background-color: #f28fad;
+}
+.btn-connected {
+    background-color: #a6e3a1; color: #11111b;
+}
+.btn-connected:hover {
+    background-color: #94e2d5;
+}
+
+/* Settings Panel (มุมบนขวา) */
+.settings-panel {
+    position: fixed; top: 20px; right: 20px; width: 280px;
+    background-color: #181825; padding: 15px; border-radius: 12px; 
+    border: 1px solid #313244; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+.settings-panel .form-group { margin-bottom: 10px; }
+.settings-panel .form-group label { display: block; margin-bottom: 3px; color: #a6adc8; font-size: 13px; }
+.settings-panel .input-box { width: 100%; padding: 8px; font-size: 12px; }
+.settings-panel .btn-save { padding: 8px 10px; font-size: 13px; }
+
+.layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+@media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { 
+    .connection-panel { position: static; width: auto; margin-bottom: 20px; }
+    .settings-panel { position: static; width: auto; margin-bottom: 20px; } 
+}
+
+.panel { background-color: #181825; padding: 20px; border-radius: 12px; border: 1px solid #313244; }
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; color: #a6adc8; }
+.input-box { 
+    width: 100%; padding: 10px; border-radius: 6px; 
+    border: 1px solid #45475a; background-color: #11111b; color: #fff; 
+    font-size: 14px; box-sizing: border-box;
+}
+
+.btn { 
+    padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer; 
+    font-weight: bold; transition: 0.2s; width: 100%;
+}
+.btn-save { background-color: #a6e3a1; color: #11111b; }
+.btn-save:hover { background-color: #94e2d5; }
+.btn-del { background-color: #f38ba8; color: #11111b; width: auto; padding: 5px 10px; }
+
+.rules-box { display: flex; flex-direction: column; gap: 10px; }
+.rule-item { 
+    background-color: #313244; padding: 10px; border-radius: 6px; 
+    display: flex; justify-content: space-between; align-items: center;
+}
+.rule-gift { font-weight: bold; color: #f9e2af; }
+.rule-cmd { font-family: monospace; font-size: 12px; color: #a6adc8; }
+
+.log-box { 
+    background-color: #11111b; padding: 15px; height: 250px; 
+    overflow-y: auto; border-radius: 8px; border: 1px solid #313244;
+    font-family: monospace; font-size: 13px;
+}
+.log-time { color: #f38ba8; font-size: 12px; margin-right: 10px; }
+
+.grid-test { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-test { background-color: #89b4fa; color: #11111b; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+/* --- ระบบกล่องตัวเลือกแบบมีรูปภาพ --- */
+.custom-select-wrapper { position: relative; width: 100%; }
+.custom-select {
+    display: flex; align-items: center; padding: 10px; border-radius: 6px;
+    border: 1px solid #45475a; background-color: #11111b; cursor: pointer;
+}
+.custom-select img { width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }
+.custom-select .arrow { margin-left: auto; font-size: 12px; color: #a6adc8; }
+.custom-options {
+    position: absolute; top: 100%; left: 0; right: 0; background-color: #181825;
+    border: 1px solid #89b4fa; border-radius: 6px; margin-top: 5px; max-height: 250px;
+    overflow-y: auto; z-index: 99; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.custom-option {
+    display: flex; align-items: center; padding: 10px; cursor: pointer; border-bottom: 1px solid #313244; transition: 0.2s;
+}
+.custom-option:hover { background-color: #313244; color: #89b4fa; }
+.custom-option img { width: 24px; height: 24px; margin-right: 10px; object-fit: contain; }
+
+/* --- ดีไซน์สำหรับป้ายราคา (Coins) --- */
+.gift-price {
+    margin-left: auto; /* ดันป้ายราคาไปชิดขวาสุด */
+    background-color: #f9e2af;
+    color: #11111b;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}

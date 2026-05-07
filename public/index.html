@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft TikTok Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+    <h1>🎮 แผงควบคุม TikTok ➡️ Minecraft</h1>
+    
+    <!-- Connection Panel (มุมบนซ้าย) -->
+    <div class="connection-panel">
+        <h4>🔌 เชื่อมต่อ</h4>
+        <button id="minecraftConnectBtn" class="btn btn-connect btn-disconnected" onclick="toggleMinecraftConnection()">
+            🎮 Minecraft
+        </button>
+        <button id="tiktokConnectBtn" class="btn btn-connect btn-disconnected" onclick="toggleTiktokConnection()">
+            📱 TikTok Live
+        </button>
+    </div>
+    
+    <!-- Settings Panel (มุมบนขวา) -->
+    <div class="settings-panel">
+        <h4>⚙️ ตั้งค่า</h4>
+        <div class="form-group">
+            <label>ชื่อ TikTok:</label>
+            <input type="text" id="tiktokUsernameInput" class="input-box" placeholder="เช่น tiktokgik">
+        </div>
+        <div class="form-group">
+            <label>ชื่อในเกม (Minecraft):</label>
+            <input type="text" id="minecraftNameInput" class="input-box" placeholder="เช่น Tawanzazaii">
+        </div>
+        <hr style="border: 1px solid #ccc; margin: 10px 0;">
+        <h5 style="margin: 10px 0;">🛰️ ตั้งค่า RCON Server</h5>
+        <div class="form-group">
+            <label>IP Address:</label>
+            <input type="text" id="rconHostInput" class="input-box" placeholder="เช่น 192.168.1.45">
+        </div>
+        <div class="form-group">
+            <label>Port:</label>
+            <input type="number" id="rconPortInput" class="input-box" placeholder="25575" min="1" max="65535">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="rconPasswordInput" class="input-box" placeholder="รหัสผ่าน RCON">
+        </div>
+        <button class="btn btn-save" onclick="saveSettings()">💾 บันทึกทั้งหมด</button>
+    </div>
+    
+    <div class="layout">
+        <!-- ฝั่งซ้าย: ตั้งค่าแบบ TikFinity -->
+        <div class="panel">
+            <h3>⚙️ ตั้งค่าของขวัญ & คำสั่ง</h3>
+            
+            <!-- เลือกประเภท: Gift, Coin, Like -->
+            <div class="form-group">
+                <label>ประเภททริกเกอร์:</label>
+                <div style="display: flex; gap: 20px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="ruleType" value="gift" checked onchange="switchRuleType('gift')" style="margin-right: 8px;">
+                        🎁 ของขวัญ
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="ruleType" value="coin" onchange="switchRuleType('coin')" style="margin-right: 8px;">
+                        🪙 จำนวนเหรียญ
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="ruleType" value="like" onchange="switchRuleType('like')" style="margin-right: 8px;">
+                        ❤️ ยอดกดหัวใจ
+                    </label>
+                </div>
+            </div>
+
+            <!-- ส่วน Gift Specific -->
+            <div id="giftSection">
+                <div class="form-group">
+                    <label>เลือกของขวัญ (Event):</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" onclick="toggleDropdown()">
+                            <img id="selectedGiftImg" src="https://cdn-icons-png.flaticon.com/512/3209/3209904.png" alt="icon">
+                            <span id="selectedGiftName">กุหลาบ (Rose)</span>
+                            <span class="arrow">▼</span>
+                        </div>
+                        <div class="custom-options" id="giftOptions" style="display: none;">
+                            <!-- รายการจะโผล่ตรงนี้ -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="giftSelectValue" value="Rose">
+                </div>
+            </div>
+
+            <!-- ส่วน Coin Amount -->
+            <div id="coinSection" style="display: none;">
+                <div class="form-group">
+                    <label>เมื่อมูลค่าของขวัญเท่ากับ (เหรียญ):</label>
+                    <input type="number" id="coinInput" class="input-box" placeholder="เช่น 1, 5, 10, 100" min="1" step="1">
+                </div>
+            </div>
+
+            <!-- ส่วน Like Amount (ใหม่ล่าสุด!) -->
+            <div id="likeSection" style="display: none;">
+                <div class="form-group">
+                    <label>สะสมยอดคนกดหัวใจครบทุกๆ (ครั้ง):</label>
+                    <input type="number" id="likeInput" class="input-box" placeholder="เช่น 50, 100, 1000" min="1" step="1">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>คำสั่ง Minecraft (Action):</label>
+                <div style="display: flex; gap: 10px; align-items: flex-end;">
+                    <input type="text" id="commandInput" class="input-box" placeholder="เช่น execute at Tawanzazaii run summon zombie ^ ^ ^3" style="flex: 1;">
+                    <div style="display: flex; flex-direction: column;">
+                        <label style="font-size: 12px; margin-bottom: 5px;">จำนวนตัว:</label>
+                        <input type="number" id="repeatInput" class="input-box" value="1" min="1" style="width: 70px; text-align: center;">
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-save" onclick="addRule()">➕ บันทึก / เพิ่มการตั้งค่า</button>
+
+            <h3 style="margin-top: 30px;">📋 รายการคำสั่งที่ตั้งไว้</h3>
+            <div id="rulesList" class="rules-box">
+                <!-- รายการจะโผล่ตรงนี้ -->
+            </div>
+        </div>
+
+        <!-- ฝั่งขวา: หน้าจอ Log -->
+        <div class="panel">
+            <h3>📜 ประวัติการทำงาน (Log)</h3>
+            <div id="logs" class="log-box"></div>
+            
+            <h3 style="margin-top: 20px;">🛠️ ปุ่มทดสอบ (Test)</h3>
+            <div id="testButtons" class="grid-test">
+                <!-- ปุ่มทดสอบจะสร้างอัตโนมัติตามของขวัญที่ตั้งไว้ -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
