@@ -2,6 +2,7 @@ const socket = io();
 let currentRules = {}; 
 let settingsConfig = { 
     tiktokUsername: "14thantawan", 
+    tipmeToken: "", // 🌟 เพิ่มตัวแปรเก็บ Token ของ TipMe
     minecraftName: "Tawanzazaii",
     rcon: {
         host: "192.168.1.45",
@@ -13,12 +14,14 @@ let settingsConfig = {
 // 🔌 ตัวแปรเก็บสถานะการเชื่อมต่อ
 let minecraftConnected = false;
 let tiktokConnected = false;
+let tipmeConnected = false; // 🌟 เพิ่มสถานะการเชื่อมต่อ TipMe
 
 // โหลด Settings จาก Server
 socket.on('load_settings', (settings) => {
     settingsConfig = settings;
-    document.getElementById('tiktokUsernameInput').value = settings.tiktokUsername;
-    document.getElementById('minecraftNameInput').value = settings.minecraftName;
+    document.getElementById('tiktokUsernameInput').value = settings.tiktokUsername || "";
+    document.getElementById('tipmeTokenInput').value = settings.tipmeToken || ""; // 🌟 โหลด Token
+    document.getElementById('minecraftNameInput').value = settings.minecraftName || "";
     
     // โหลด RCON Settings
     if (settings.rcon) {
@@ -32,6 +35,7 @@ socket.on('load_settings', (settings) => {
 socket.on('connection_status', (status) => {
     minecraftConnected = status.minecraft;
     tiktokConnected = status.tiktok;
+    tipmeConnected = status.tipme; // 🌟 รับสถานะ TipMe
     updateConnectionButtons();
 });
 
@@ -39,6 +43,7 @@ socket.on('connection_status', (status) => {
 function updateConnectionButtons() {
     const minecraftBtn = document.getElementById('minecraftConnectBtn');
     const tiktokBtn = document.getElementById('tiktokConnectBtn');
+    const tipmeBtn = document.getElementById('tipmeConnectBtn'); // 🌟 ปุ่ม TipMe
     
     if (minecraftBtn) {
         if (minecraftConnected) {
@@ -63,6 +68,19 @@ function updateConnectionButtons() {
             tiktokBtn.classList.add('btn-disconnected');
         }
     }
+
+    // 🌟 อัปเดตปุ่ม TipMe
+    if (tipmeBtn) {
+        if (tipmeConnected) {
+            tipmeBtn.textContent = '💸 TipMe ✓';
+            tipmeBtn.classList.remove('btn-disconnected');
+            tipmeBtn.classList.add('btn-connected');
+        } else {
+            tipmeBtn.textContent = '💸 TipMe';
+            tipmeBtn.classList.remove('btn-connected');
+            tipmeBtn.classList.add('btn-disconnected');
+        }
+    }
 }
 
 // 🎮 กดปุ่มเชื่อมต่อ Minecraft
@@ -75,21 +93,28 @@ function toggleTiktokConnection() {
     socket.emit('toggle_tiktok');
 }
 
+// 💸 กดปุ่มเชื่อมต่อ TipMe (ใหม่!)
+function toggleTipmeConnection() {
+    socket.emit('toggle_tipme');
+}
+
 // บันทึก Settings
 function saveSettings() {
     const tiktokUsername = document.getElementById('tiktokUsernameInput').value.trim();
+    const tipmeToken = document.getElementById('tipmeTokenInput').value.trim(); // 🌟 เซฟ Token
     const minecraftName = document.getElementById('minecraftNameInput').value.trim();
     const rconHost = document.getElementById('rconHostInput').value.trim();
     const rconPort = parseInt(document.getElementById('rconPortInput').value);
     const rconPassword = document.getElementById('rconPasswordInput').value;
     
     if (!tiktokUsername || !minecraftName || !rconHost || !rconPort) {
-        alert("กรุณาใส่ข้อมูลให้ครบถ้วน!");
+        alert("กรุณาใส่ข้อมูลพื้นฐานให้ครบถ้วน!");
         return;
     }
     
     settingsConfig = { 
         tiktokUsername, 
+        tipmeToken, // 🌟 ส่ง Token ไปบันทึก
         minecraftName,
         rcon: {
             host: rconHost,
@@ -153,7 +178,7 @@ const giftCatalog = [
 ];
 
 window.onload = () => {
-    updateConnectionButtons(); // อัปเดตสถานะปุ่มเมื่อโหลดหน้า
+    updateConnectionButtons();
     const optionsContainer = document.getElementById('giftOptions');
     giftCatalog.forEach(gift => {
         optionsContainer.innerHTML += `
@@ -171,11 +196,12 @@ function toggleDropdown() {
     options.style.display = options.style.display === "none" ? "block" : "none";
 }
 
-// 🌟 อัปเดต: สลับหน้าจอให้รองรับ 3 แบบ (Gift, Coin, Like)
+// 🌟 อัปเดต: สลับหน้าจอให้รองรับ 4 แบบ (Gift, Coin, Like, TipMe)
 function switchRuleType(type) {
     document.getElementById('giftSection').style.display = type === 'gift' ? 'block' : 'none';
     document.getElementById('coinSection').style.display = type === 'coin' ? 'block' : 'none';
     document.getElementById('likeSection').style.display = type === 'like' ? 'block' : 'none';
+    document.getElementById('tipmeSection').style.display = type === 'tipme' ? 'block' : 'none'; // 🌟 โชว์ช่อง TipMe
 }
 
 function selectGift(id, name, img, price) {
@@ -190,6 +216,15 @@ socket.on('log', (message) => {
     const logsDiv = document.getElementById('logs');
     const time = new Date().toLocaleTimeString('th-TH');
     logsDiv.innerHTML += `<div><span class="log-time">[${time}]</span> ${message}</div>`;
+    
+    // จำกัด logs ไม่ให้เก็บเกิน 500 messages
+    const logEntries = logsDiv.querySelectorAll('div');
+    if (logEntries.length > 500) {
+        // ลบ 100 entries จากบน เมื่อเกิน 500
+        for (let i = 0; i < 100; i++) {
+            logEntries[i].remove();
+        }
+    }
     logsDiv.scrollTop = logsDiv.scrollHeight;
 });
 
@@ -198,7 +233,7 @@ socket.on('load_rules', (rules) => {
     renderRules();
 });
 
-// 🌟 อัปเดต: ระบบบันทึกข้อมูลที่รองรับ Like
+// 🌟 อัปเดต: ระบบบันทึกข้อมูลที่รองรับ TipMe
 function addRule() {
     const ruleType = document.querySelector('input[name="ruleType"]:checked').value;
     const cmd = document.getElementById('commandInput').value;
@@ -235,6 +270,14 @@ function addRule() {
         }
         currentRules[`like:${like}`] = ruleData;
         document.getElementById('likeInput').value = '';
+    } else if (ruleType === 'tipme') { // 🌟 ระบบเซฟข้อมูล TipMe
+        const tipmeAmount = document.getElementById('tipmeInput').value;
+        if (!tipmeAmount || tipmeAmount <= 0) {
+            alert("กรุณาใส่ยอดโดเนทที่ถูกต้อง!");
+            return;
+        }
+        currentRules[`tipme:${tipmeAmount}`] = ruleData; // จะเซฟเป็นคำว่า tipme:10
+        document.getElementById('tipmeInput').value = '';
     }
 
     socket.emit('save_rules', currentRules);
@@ -242,11 +285,12 @@ function addRule() {
     document.getElementById('repeatInput').value = '1';
 }
 
-// 🌟 อัปเดต: ระบบลบข้อมูลที่รู้จักคำว่า like
+// 🌟 อัปเดต: ระบบลบข้อมูลที่รู้จักคำว่า tipme
 function deleteRule(key) {
     let displayName = key;
     if (key.startsWith('coin:')) displayName = `เหรียญ ${key.split(':')[1]}`;
     if (key.startsWith('like:')) displayName = `ยอดหัวใจ ${key.split(':')[1]}`;
+    if (key.startsWith('tipme:')) displayName = `ยอดโดเนท ${key.split(':')[1]} บาท`; // 🌟 แปลงชื่อ TipMe
     
     if(confirm(`ต้องการลบการตั้งค่า ${displayName} ใช่หรือไม่?`)) {
         delete currentRules[key];
@@ -254,7 +298,7 @@ function deleteRule(key) {
     }
 }
 
-// 🌟 อัปเดต: ระบบแสดงผลที่แยกแยะได้ทั้ง 3 แบบ
+// 🌟 อัปเดต: ระบบแสดงผลที่แยกแยะได้ 4 แบบรวม TipMe
 function renderRules() {
     const rulesList = document.getElementById('rulesList');
     const testButtons = document.getElementById('testButtons');
@@ -262,15 +306,13 @@ function renderRules() {
     testButtons.innerHTML = '';
 
     for (const [key, ruleValue] of Object.entries(currentRules)) {
-        // รองรับทั้ง format เก่า (string) และใหม่ (object)
         const cmd = typeof ruleValue === 'string' ? ruleValue : ruleValue.cmd;
         const repeatCount = typeof ruleValue === 'string' ? 1 : (ruleValue.repeat || 1);
-        const fullCmd = repeatCount > 1 ? 
-            Array(repeatCount).fill(cmd).join(' && ') : cmd;
 
         const isCoin = key.startsWith('coin:');
         const isLike = key.startsWith('like:');
-        const isGift = !isCoin && !isLike;
+        const isTipme = key.startsWith('tipme:'); // 🌟 เช็คว่าเป็น TipMe หรือไม่
+        const isGift = !isCoin && !isLike && !isTipme;
 
         if (isGift) {
             const giftInfo = giftCatalog.find(g => g.id === key);
@@ -302,6 +344,7 @@ function renderRules() {
             `;
         } else if (isCoin) {
             const coins = key.split(':')[1];
+            // โค้ดเรนเดอร์เหรียญ (เหมือนเดิม)
             rulesList.innerHTML += `
                 <div class="rule-item">
                     <div style="display: flex; align-items: center; width: 100%;">
@@ -319,14 +362,11 @@ function renderRules() {
                     <button class="btn btn-del" onclick="deleteRule('${key}')">ลบ</button>
                 </div>
             `;
+            testButtons.innerHTML += `<button class="btn-test" onclick="socket.emit('test_command', '${key}')">ทดสอบ 🪙${coins}</button>`;
 
-            testButtons.innerHTML += `
-                <button class="btn-test" onclick="socket.emit('test_command', '${key}')">
-                    ทดสอบ 🪙${coins}
-                </button>
-            `;
         } else if (isLike) {
             const likes = key.split(':')[1];
+            // โค้ดเรนเดอร์หัวใจ (เหมือนเดิม)
             rulesList.innerHTML += `
                 <div class="rule-item">
                     <div style="display: flex; align-items: center; width: 100%;">
@@ -344,12 +384,28 @@ function renderRules() {
                     <button class="btn btn-del" onclick="deleteRule('${key}')">ลบ</button>
                 </div>
             `;
+            testButtons.innerHTML += `<button class="btn-test" onclick="socket.emit('test_command', '${key}')">ทดสอบ ❤️${likes}</button>`;
 
-            testButtons.innerHTML += `
-                <button class="btn-test" onclick="socket.emit('test_command', '${key}')">
-                    ทดสอบ ❤️${likes}
-                </button>
+        } else if (isTipme) { // 🌟 โค้ดเรนเดอร์ TipMe
+            const amount = key.split(':')[1];
+            rulesList.innerHTML += `
+                <div class="rule-item">
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <div style="width:28px; height:28px; margin-right:15px; border-radius: 4px; background: #a6e3a1; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            💸
+                        </div>
+                        <div style="flex-grow: 1;">
+                            <div class="rule-gift" style="display: flex; align-items: center;">
+                                💸 ยอดโดเนท (TipMe) ${amount} บาท
+                                <span style="margin-left: 10px; background: #ffd700; color: #111; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">×${repeatCount}</span>
+                            </div>
+                            <div class="rule-cmd">/${cmd}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-del" onclick="deleteRule('${key}')">ลบ</button>
+                </div>
             `;
+            testButtons.innerHTML += `<button class="btn-test" onclick="socket.emit('test_command', '${key}')">ทดสอบ 💸${amount} บ.</button>`;
         }
     }
 

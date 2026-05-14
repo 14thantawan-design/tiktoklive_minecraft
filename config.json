@@ -1,14 +1,83 @@
 {
-  "Rose": {
-    "cmd": "execute at {player} run summon pig",
-    "repeat": 15
+  "tipme:1": {
+    "cmd": "execute at {player} run summon zombie",
+    "repeat": 1
   },
-  "like:5": {
+  "like:100": {
     "cmd": "execute at {player} run summon pig",
-    "repeat": 5
+    "repeat": 1
+  },
+  "Rose": {
+    "cmd": "execute at {player} run summon zombie",
+    "repeat": 1
+  },
+  "Finger Heart": {
+    "cmd": "execute at {player} run summon creeper",
+    "repeat": 1
+  },
+  "tipme:5": {
+    "cmd": "execute at {player} run summon creeper",
+    "repeat": 2
+  },
+  "Friendship Necklace": {
+    "cmd": "execute at {player} run summon creeper ",
+    "repeat": 4
+  },
+  "tipme:10": {
+    "cmd": "execute at {player} run summon creeper",
+    "repeat": 8
+  },
+  "Baby Hippo": {
+    "cmd": "execute at {player} run summon witch",
+    "repeat": 1
+  },
+  "tipme:15": {
+    "cmd": "execute at {player} run summon witch",
+    "repeat": 10
+  },
+  "tipme:50": {
+    "cmd": "execute at {player} run summon ravager",
+    "repeat": 3
+  },
+  "Mishka Bear": {
+    "cmd": "execute at {player} run summon ravager",
+    "repeat": 1
+  },
+  "coin:10": {
+    "cmd": "execute at {player} run summon creeper",
+    "repeat": 4
+  },
+  "coin:15": {
+    "cmd": "execute at {player} run summon witch",
+    "repeat": 1
+  },
+  "coin:1": {
+    "cmd": "execute at {player} run summon zombie",
+    "repeat": 1
+  },
+  "coin:5": {
+    "cmd": "execute at {player} run summon creeper",
+    "repeat": 1
+  },
+  "coin:100": {
+    "cmd": "execute at {player} run summon ravager",
+    "repeat": 1
+  },
+  "tipme:20": {
+    "cmd": "execute at {player} run summon zombie",
+    "repeat": 50
+  },
+  "tipme:30": {
+    "cmd": "execute at {player} run summon creeper",
+    "repeat": 100
+  },
+  "tipme:6": {
+    "cmd": "time set night",
+    "repeat": 1
   },
   "settings": {
     "tiktokUsername": "14thantawan",
+    "tipmeToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IjYyRTcxRTkwOUE1Q0QyRTUzRTI2RkIwQUY0QkE1RTE1MzJGOEJEOThBQzI4OTg3NjhENkFFNTBEMTQ3QzU1QUYxMUJGQTQ2RDUwMzQ2QTk2MDlCQTQ3RjFBMzNFRTdDMjgyOENFRTA3MjQ3NEFDMDE1NzhCQTlBQjA5QURFN0ZFODE5NzI1RjE2ODM4Q0QzQzdENzlBQTFEMkRERUIzMEJBN0MwQTdCQjBCOUM3QUI4N0YwMUNENjAwOTIxODhDRTlGMUVDOTkxODVGOEM5QkMzRjFGQjQ3ODIzOEQ0RUREODk4QjkwQUM4MDJBMDY0OEQ5RUFDQzY0RjciLCJyZWFkX29ubHkiOnRydWUsInByZXZlbnRfbWFzdGVyIjp0cnVlLCJzdHJlYW1sYWJzX2lkIjoiNzIwODA2MjIxNTkwNjEzMTk2OCJ9.Bh4AcffJxDjL2v1vkaFsj2BAuPU_07YfLypXLswLkIw",
     "minecraftName": "Tawanzazaii",
     "rcon": {
       "host": "192.168.0.103",
